@@ -1,20 +1,9 @@
-/*  Example changing the gain of a sinewave,
-    using Mozzi sonification library.
-
-    Demonstrates the use of a control variable to influence an
-    audio signal.
-
-    Circuit: Audio output on digital pin 9 on a Uno or similar, or
-    DAC/A14 on Teensy 3.1, or
-    check the README or http://sensorium.github.io/Mozzi/
-
-    Mozzi documentation/API
-    https://sensorium.github.io/Mozzi/doc/html/index.html
-
-    Mozzi help/discussion/announcements:
-    https://groups.google.com/forum/#!forum/mozzi-users
-
-    Tim Barrass 2012, CC by-nc-sa.
+/*  Synthrio
+ *   Work of art
+ *   Julian Henao - Artist
+ *   Nick Velasquez - HW
+ *   Made by: Nick Velasquez
+ *   2022
 */
 #include <WiFi.h>
 #include <PubSubClient.h>
@@ -112,17 +101,16 @@ const int automataHook_inner_timeout = 120;
 const char* ssid = "SYNTHRIO";
 const char* password = "armatostre";
 
-//const char* ssid = "KURO 2.4ETB";
-//const char* password = "TururuTuru";
-
 // MQTT configuration
 const char* mqtt_server = "192.168.3.71";
-//const char* mqtt_server = "192.168.5.113";
 
 String base_topic = "SynthRio";
 String subtopic_led;
 String subtopic_data;
 String subtopic_config;
+String subtopic_all_led;
+String subtopic_all_data;
+String subtopic_all_config;
 String pubtopic_general;
 char * pubtopic_register = "SynthRio/register";
 char * pubtopic_keepalive = "SynthRio/keepalive";
@@ -193,7 +181,7 @@ void callback(char* topic, byte* message, unsigned int length) {
       digitalWrite(ledPin, LOW);
     }
   }
-  else if (String(topic) == subtopic_data) 
+  else if (String(topic) == subtopic_data || String(topic) == subtopic_all_data) 
   {
       char *ptr = NULL;
       
@@ -212,7 +200,7 @@ void callback(char* topic, byte* message, unsigned int length) {
       gain = audio_parameters[1];
 //    Serial.println(freq);
   }
-  else if (String(topic) == subtopic_config) 
+  else if (String(topic) == subtopic_config || String(topic) == subtopic_all_config) 
   {
     gain = messageTemp.toInt();
     Serial.println(gain);
@@ -518,6 +506,9 @@ void setup(){
   subtopic_data = base_topic + "/" + device_id + "/" + "data";
   subtopic_config = base_topic + "/" + device_id + "/" + "config";
   subtopic_led = base_topic + "/" + device_id + "/" + "led";
+  subtopic_all_data = base_topic + "/all/" + "data";
+  subtopic_all_config = base_topic + "/all/" + "config";
+  subtopic_all_led = base_topic + "/all/" + "led";
   pubtopic_general = base_topic + "/" + device_id;
 
   
