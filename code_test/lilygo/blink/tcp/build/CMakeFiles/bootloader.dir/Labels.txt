@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/tcp/build/CMakeFiles/bootloader
+/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/tcp/build/CMakeFiles/bootloader.rule
+/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/tcp/build/CMakeFiles/bootloader-complete.rule
+/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/tcp/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/tcp/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/tcp/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/tcp/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/tcp/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/tcp/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/tcp/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

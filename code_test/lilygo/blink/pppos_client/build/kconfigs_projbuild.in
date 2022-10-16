@@ -1,0 +1,6 @@
+source "/home/nick/esp/esp-idf/components/app_update/Kconfig.projbuild"
+source "/home/nick/esp/esp-idf/components/bootloader/Kconfig.projbuild"
+source "/home/nick/esp/esp-idf/components/esp_rom/Kconfig.projbuild"
+source "/home/nick/esp/esp-idf/components/esptool_py/Kconfig.projbuild"
+source "/home/nick/esp/esp-idf/components/partition_table/Kconfig.projbuild"
+source "/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/pppos_client/main/Kconfig.projbuild"

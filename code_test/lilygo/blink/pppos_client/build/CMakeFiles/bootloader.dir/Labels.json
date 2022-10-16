@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/pppos_client/build/CMakeFiles/bootloader"
+		},
+		{
+			"file" : "/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/pppos_client/build/CMakeFiles/bootloader.rule"
+		},
+		{
+			"file" : "/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/pppos_client/build/CMakeFiles/bootloader-complete.rule"
+		},
+		{
+			"file" : "/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/pppos_client/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+		},
+		{
+			"file" : "/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/pppos_client/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+		},
+		{
+			"file" : "/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/pppos_client/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+		},
+		{
+			"file" : "/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/pppos_client/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+		},
+		{
+			"file" : "/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/pppos_client/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+		},
+		{
+			"file" : "/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/pppos_client/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+		},
+		{
+			"file" : "/home/nick/Documents/Repository/Nick/Synth-Rio/code_test/lilygo/blink/pppos_client/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"bootloader"
+		],
+		"name" : "bootloader"
+	}
+}
