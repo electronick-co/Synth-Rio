@@ -105,15 +105,21 @@ const char* password = "armatostre";
 const char* mqtt_server = "192.168.3.71";
 
 String base_topic = "SynthRio";
-String subtopic_led;
-String subtopic_data;
-String subtopic_config;
-String subtopic_all_led;
-String subtopic_all_data;
-String subtopic_all_config;
+String subtopic_broadcast = "SynthRio/all/#";
+String subtopic_myself;
+
+String subtopic_led = "led";
+String subtopic_data = "data";
+String subtopic_config = "config";
+String subtopic_config_p1 = "p1";
+String subtopic_config_p2 = "p2";
+String subtopic_config_p3 = "p3";
+
 String pubtopic_general;
 char * pubtopic_register = "SynthRio/register";
 char * pubtopic_keepalive = "SynthRio/keepalive";
+
+char * mqtt_topic_parts[5];
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -168,9 +174,22 @@ void callback(char* topic, byte* message, unsigned int length) {
   // Restart automata time when a message is received.
   automata_time = millis();
 
-  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
+  //Divide the topic into the components
+     char *ptr1 = NULL;
+     byte index = 0;
+     ptr1 = strtok(topic, "/");  // delimiter
+     while (ptr1 != NULL)
+     {
+        mqtt_topic_parts[index] = ptr1;
+        Serial.println(ptr1);
+        index++;
+        ptr1 = strtok(NULL, "/");
+     }
+
+  // ------------------- Check topic and do the actions --------------------
+  // LED Status
   // Changes the output state according to the message
-  if (String(topic) == subtopic_led) {
+  if (String(mqtt_topic_parts[2]) == subtopic_led) {
     Serial.print("Changing output to ");
     if(messageTemp == "on"){
       Serial.println("on");
@@ -181,10 +200,11 @@ void callback(char* topic, byte* message, unsigned int length) {
       digitalWrite(ledPin, LOW);
     }
   }
-  else if (String(topic) == subtopic_data || String(topic) == subtopic_all_data) 
+  // Receive all the data
+  else if (String(mqtt_topic_parts[2]) == subtopic_data ) 
   {
+      Serial.println("Data message received");
       char *ptr = NULL;
-      
       
       byte index = 0;
        ptr = strtok((char *)messageTemp.c_str(), ",");  // delimiter
@@ -200,10 +220,25 @@ void callback(char* topic, byte* message, unsigned int length) {
       gain = audio_parameters[1];
 //    Serial.println(freq);
   }
-  else if (String(topic) == subtopic_config || String(topic) == subtopic_all_config) 
+  // individual parameter control
+  else if (String(mqtt_topic_parts[2]) == subtopic_config) 
   {
-    gain = messageTemp.toInt();
-    Serial.println(gain);
+    Serial.println("Config message received");
+    if (String(mqtt_topic_parts[3]) == subtopic_config_p1) 
+    {
+      audio_parameters[0] = String(messageTemp).toInt();
+      Serial.println(audio_parameters[0]);
+    }
+    else if (String(mqtt_topic_parts[3]) == subtopic_config_p2) 
+    {
+      audio_parameters[1] = String(messageTemp).toInt();
+      Serial.println(audio_parameters[1]);
+    }
+    else if (String(mqtt_topic_parts[3]) == subtopic_config_p3) 
+    {
+      audio_parameters[2] = String(messageTemp).toInt();
+      Serial.println(audio_parameters[2]);
+    }
   }
 }
 
@@ -215,9 +250,11 @@ void reconnect() {
     if (client.connect(device_id.c_str())) {
       Serial.println("connected");
       // Subscribe
-      client.subscribe(subtopic_led.c_str());
-      client.subscribe(subtopic_data.c_str());
-      client.subscribe(subtopic_config.c_str());
+      client.subscribe(subtopic_broadcast.c_str());
+      client.subscribe(subtopic_myself.c_str());
+//      client.subscribe(subtopic_led.c_str());
+//      client.subscribe(subtopic_data.c_str());
+//      client.subscribe(subtopic_config.c_str());
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -255,58 +292,6 @@ long fm_intensity; // carries control info from updateControl to updateAudio
 float smoothness = 0.95f;
 Smooth <long> aSmoothIntensity(smoothness);
 
-//--------------------------------------<Light Temperature> Multi Oscil------------------------------------
-//#define CONTROL_RATE 256
-//#define NUM_VOICES 8
-//#define THRESHOLD 10
-//
-//// harmonics
-//Oscil<COS8192_NUM_CELLS, AUDIO_RATE> aCos1(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, AUDIO_RATE> aCos2(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, AUDIO_RATE> aCos3(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, AUDIO_RATE> aCos4(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, AUDIO_RATE> aCos5(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, AUDIO_RATE> aCos6(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, AUDIO_RATE> aCos7(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, AUDIO_RATE> aCos0(COS8192_DATA);
-//
-//// volume controls
-//Oscil<COS8192_NUM_CELLS, CONTROL_RATE> kVol1(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, CONTROL_RATE> kVol2(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, CONTROL_RATE> kVol3(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, CONTROL_RATE> kVol4(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, CONTROL_RATE> kVol5(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, CONTROL_RATE> kVol6(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, CONTROL_RATE> kVol7(COS8192_DATA);
-//Oscil<COS8192_NUM_CELLS, CONTROL_RATE> kVol0(COS8192_DATA);
-//
-//// audio volumes updated each control interrupt and reused in audio till next control
-//char v1,v2,v3,v4,v5,v6,v7,v0;
-//
-//// notes to play depending on whether temperature reading increases or decreases
-//float upnotes[NUM_VOICES] = {
-//  mtof(62.f),mtof(64.f),mtof(70.f),mtof(72.f),mtof(79.f),mtof(81.f), mtof(86.f), mtof(88.f)};
-//
-//float downnotes[NUM_VOICES] = {
-//  mtof(64.f),mtof(65.f),mtof(88.f),mtof(72.f),mtof(79.f),mtof(84.f),mtof(86.f),mtof(89.f)};
-
-
-
-//// returns freq
-//int temperatureToFreq(char oscil_num, int temperature){
-//  static int previous_temperature;
-//  int freq;
-//  if (temperature>previous_temperature){
-//    freq = upnotes[oscil_num];
-//  } else {
-//     freq = downnotes[oscil_num];
-//  }
-//  previous_temperature = temperature;
-//  return freq;
-//}
-
-
-
 void updateControl(){
   // ------------------------------------- Sine Wave --------------------------------------------
 //  aSin.setFreq(freq);
@@ -332,111 +317,22 @@ void updateControl(){
   float mod_speed = (float)kMapModSpeed(audio_parameters[2])/1000;
   kIntensityMod.setFreq(mod_speed);
 
-  //--------------------------------------<Light Temperature> Multi Oscil------------------------------------
-
-//  static float previous_pulse_freq;
-//
-//  // read analog inputs
-//  int temperature = audio_parameters[0];
-//  int light = audio_parameters[1];
-//
-//  // map light reading to volume pulse frequency
-//  float pulse_freq = light;
-//  previous_pulse_freq = pulse_freq;
-//
-//  v0 = kVol0.next();
-//  v1 = kVol1.next();
-//  v2 = kVol2.next();
-//  v3 = kVol3.next();
-//  v4 = kVol4.next();
-//  v5 = kVol5.next();
-//  v6 = kVol6.next();
-//  v7 = kVol7.next();
-//
-//  // set one note oscillator frequency each time (if it's volume is close to 0)
-//  static char whoseTurn;
-//  switch(whoseTurn){
-//  case 0:
-//    kVol0.setFreq(pulse_freq);
-//    if(abs(v0)<THRESHOLD) aCos0.setFreq(temperatureToFreq(0,temperature));
-//    break;
-//
-//  case 1:
-//    kVol1.setFreq(pulse_freq);
-//    if(abs(v1)<THRESHOLD) aCos1.setFreq(temperatureToFreq(1,temperature));
-//    break;
-//
-//  case 2:
-//    kVol2.setFreq(pulse_freq);
-//    if(abs(v2)<THRESHOLD) aCos2.setFreq(temperatureToFreq(2,temperature));
-//    break;
-//
-//  case 3:
-//    kVol3.setFreq(pulse_freq);
-//    if(abs(v3)<THRESHOLD) aCos3.setFreq(temperatureToFreq(3,temperature));
-//    break;
-//
-//  case 4:
-//    kVol4.setFreq(pulse_freq);
-//    if(abs(v4)<THRESHOLD) aCos4.setFreq(temperatureToFreq(4,temperature));
-//    break;
-//
-//  case 5:
-//    kVol5.setFreq(pulse_freq);
-//    if(abs(v5)<THRESHOLD) aCos5.setFreq(temperatureToFreq(5,temperature));
-//    break;
-//
-//  case 6:
-//    kVol6.setFreq(pulse_freq);
-//    if(abs(v6)<THRESHOLD) aCos6.setFreq(temperatureToFreq(6,temperature));
-//    break;
-//
-//  case 7:
-//    kVol7.setFreq(pulse_freq);
-//    if(abs(v7)<THRESHOLD) aCos7.setFreq(temperatureToFreq(7,temperature));
-//    break;
-//
-//  }
-//
-//    if(++whoseTurn>=NUM_VOICES) whoseTurn = 0;
 }
-  
-
 
 
 int updateAudio(){
-  // ------------------------------------- Sine Wave --------------------------------------------
-//  Q15n16 vibrato = (Q15n16) 255 * aVibrato.next();
-//  //return (aSin.phMod(vibrato) * gain)>>8; // shift back to STANDARD audio range, like /256 but faster
-//  return (aSin.next()* gain)>>8; // shift back to STANDARD audio range, like /256 but faster
-
   //--------------------------------------3 variable FMSynth------------------------------------
 
   long modulation = aSmoothIntensity.next(fm_intensity) * aModulator.next();
   return MonoOutput::from8Bit(aCarrier.phMod(modulation));
 
-  //--------------------------------------<Light Temperature> Multi Oscil------------------------------------
-
-//  long asig = (long)
-//    aCos0.next()*v0 +
-//      aCos1.next()*v1 +
-//      aCos2.next()*v2 +
-//      aCos3.next()*v3;
-////      aCos4.next()*v4 +
-////      aCos5.next()*v5 +
-////      aCos6.next()*v6 +
-////      aCos7.next()*v7;
-//  asig >>= 8; // shift back to audio output range
-//  return (int) asig;
-  
 }
 
 void mozzi_setup()
 {
   //Mozzi Setup
   startMozzi(); // start with default control rate of 64
-//  aSin.setFreq(440); // set the frequency
-//  aVibrato.setFreq(0);
+
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------                     
@@ -481,7 +377,7 @@ void id_assign()
   {
     device_id = "atrato";
   }
-  else if (mac.equals("0C:DC:7E:62:BE:EC"))
+  else if (mac.equals("E8:31:CD:D6:EF:60"))
   {
     device_id = "sinu";
   }
@@ -503,12 +399,14 @@ void setup(){
 
   //Check what ID is this device and change topics based on that
   id_assign(); 
-  subtopic_data = base_topic + "/" + device_id + "/" + "data";
-  subtopic_config = base_topic + "/" + device_id + "/" + "config";
-  subtopic_led = base_topic + "/" + device_id + "/" + "led";
-  subtopic_all_data = base_topic + "/all/" + "data";
-  subtopic_all_config = base_topic + "/all/" + "config";
-  subtopic_all_led = base_topic + "/all/" + "led";
+  subtopic_myself = base_topic + "/" + device_id + "/#";
+//  
+//  subtopic_data = base_topic + "/" + device_id + "/" + "data/#";
+//  subtopic_config = base_topic + "/" + device_id + "/" + "config";
+//  subtopic_led = base_topic + "/" + device_id + "/" + "led";
+//  subtopic_all_data = base_topic + "/all/" + "data";
+//  subtopic_all_config = base_topic + "/all/" + "config";
+//  subtopic_all_led = base_topic + "/all/" + "led";
   pubtopic_general = base_topic + "/" + device_id;
 
   
